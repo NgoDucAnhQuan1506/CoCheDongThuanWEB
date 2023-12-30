@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -17,8 +17,14 @@ export default function Admin({ role, contract, web3, currentAccount }) {
   const [electionState, setElectionState] = useState(0);
   const [loading, setLoading] = useState(true);
   const [candidates, setCandidates] = useState([]);
-
+  const [hightVote, setHightVote] = useState({});
+  const [lengthVote, setLengthVote] = useState(0);
   const [open, setOpen] = useState(false);
+  const voterCount = useRef(0);// State để lưu trữ số lượng người được thêm vào
+
+  const incrementVoterCount = () => {
+    voterCount.current += 1; // Tăng biến đếm khi có địa chỉ được thêm vào
+  };
 
   const getCandidates = async () => {
     if (contract) {
@@ -29,6 +35,17 @@ export default function Admin({ role, contract, web3, currentAccount }) {
         const candidate = await contract.methods.getCandidateDetails(i).call();
         temp.push({ name: candidate[0], votes: candidate[1] });
       }
+      let itemHight = null;
+      let tmplengthVote = lengthVote;
+      for (let i = 0; i < temp.length; i++) {
+        if(parseInt(temp[i].votes) > tmplengthVote){
+          itemHight = temp[i];
+          tmplengthVote = temp[i].votes;
+        }
+      }
+      console.log(lengthVote);
+      setLengthVote(tmplengthVote);
+      setHightVote(itemHight);
       setCandidates(temp);
       setLoading(false);
       console.log(temp);
@@ -41,6 +58,15 @@ export default function Admin({ role, contract, web3, currentAccount }) {
       setElectionState(parseInt(state));
     }
   };
+
+  useEffect(() => {
+    if(hightVote){
+      if((parseInt(hightVote.votes) * 100 / parseInt(voterCount.current)) > 51){
+        handleAgree();
+      }
+    }
+    console.log(voterCount.current);
+  }, [parseInt(voterCount.current)])
 
   useEffect(() => {
     getElectionState();
@@ -150,6 +176,7 @@ export default function Admin({ role, contract, web3, currentAccount }) {
                     contract={contract}
                     web3={web3}
                     currentAccount={currentAccount}
+                    onVoterAdded={incrementVoterCount}
                   />
                   <CandidateForm
                     contract={contract}
@@ -185,7 +212,30 @@ export default function Admin({ role, contract, web3, currentAccount }) {
               </Grid>
             )}
           </Grid>
-
+          {hightVote ? (
+                <>
+                  <h2 style={{ fontSize: '23x', color: '#fff', display: 'flex' , justifyContent:'center'}}>Người có số phiếu bầu cao nhất</h2>
+                  <Grid
+                    container
+                    item
+                    xs={12}
+                    sx={{
+                      overflowY: "hidden",
+                      overflowX: "auto",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Grid item sx={{ width: "98vw", display: "flex", justifyContent: "center"}}>
+                      <Box sx={{ mx: 2 , marginTop: '50px'}}>
+                        <Candidate
+                          name={hightVote.name}
+                          voteCount={hightVote.votes}
+                        />
+                      </Box>
+                    </Grid>
+                  </Grid>
+                </>
+              ): <></>}
           <Dialog
             open={open}
             onClose={handleClose}
