@@ -4,16 +4,16 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import { Stack } from "@mui/material";
 
-export default function VotersForm({ contract, web3, currentAccount, onVoterAdded}) {
+export default function VotersForm({ contract, web3, currentAccount}) {
   const [name, setName] = useState("");
   const handleForm = async (event) => {
     event.preventDefault();
     try {
       await contract.methods.addVoter(name).send({ from: currentAccount });
       console.log("voter added");
-      if (onVoterAdded) {
-        onVoterAdded();
-      }
+      // if (onVoterAdded) {
+      //   onVoterAdded();
+      // }
     } catch (error) {
       console.log(error);
     }

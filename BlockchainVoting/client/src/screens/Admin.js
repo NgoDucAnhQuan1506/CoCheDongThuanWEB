@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import Button from "@mui/material/Button";
@@ -20,11 +20,11 @@ export default function Admin({ role, contract, web3, currentAccount }) {
   const [hightVote, setHightVote] = useState({});
   const [lengthVote, setLengthVote] = useState(0);
   const [open, setOpen] = useState(false);
-  const voterCount = useRef(0);// State để lưu trữ số lượng người được thêm vào
+  //const [voterCount, setVoterCount] = useState(0);// State để lưu trữ số lượng người được thêm vào
 
-  const incrementVoterCount = () => {
-    voterCount.current += 1; // Tăng biến đếm khi có địa chỉ được thêm vào
-  };
+  // const incrementVoterCount = () => {
+  //   setVoterCount(prevCount => prevCount + 1); // Tăng biến đếm khi có địa chỉ được thêm vào
+  // };
 
   const getCandidates = async () => {
     if (contract) {
@@ -59,14 +59,14 @@ export default function Admin({ role, contract, web3, currentAccount }) {
     }
   };
 
-  useEffect(() => {
-    if(hightVote){
-      if((parseInt(hightVote.votes) * 100 / parseInt(voterCount.current)) > 51){
-        handleAgree();
-      }
-    }
-    console.log(voterCount.current);
-  }, [parseInt(voterCount.current)])
+  // useEffect(() => {
+  //   if(hightVote){
+  //     if((parseInt(hightVote.votes) * 100 / voterCount) > 51){
+  //       handleAgree();
+  //     }
+  //   }
+  //   console.log(voterCount);
+  // }, [voterCount])
 
   useEffect(() => {
     getElectionState();
@@ -176,7 +176,7 @@ export default function Admin({ role, contract, web3, currentAccount }) {
                     contract={contract}
                     web3={web3}
                     currentAccount={currentAccount}
-                    onVoterAdded={incrementVoterCount}
+                    //onVoterAdded={incrementVoterCount}
                   />
                   <CandidateForm
                     contract={contract}
